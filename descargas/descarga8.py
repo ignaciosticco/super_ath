@@ -31,7 +31,7 @@ pylab.rcParams.update(params)
 
 ### DATA ###
 
-data1 = np.genfromtxt('in_print_descarga_225p_v10', delimiter = ' ')
+data1 = np.genfromtxt('in_print_descarga_225p_v4', delimiter = ' ')
 
 time=data1[:,0]
 evacuated=data1[:,1]
@@ -87,7 +87,7 @@ def burst(begin, end):
      vector_tau=[]
      for tau in range(begin,end+1):
           burst+=[avalanchas(tau)[0]]
-          vector_tau+=[tau]
+          vector_tau+=[tau*0.05]
      return vector_tau, burst
 print(burst(1, 24))
 
@@ -110,4 +110,4 @@ pylab.ylim(0, 120)
 #pylab.xlim(0, 120)
 #lgd=plt.legend(numpoints=1,handlelength=0.8) 
 #lgd.set_visible(True)   
-pylab.savefig('tau_vs_burst_225p_v10_g0.eps', format='eps', dpi=300, bbox_inches='tight')
+pylab.savefig('tau_vs_burst_225p_v4_g0.eps', format='eps', dpi=300, bbox_inches='tight')
