@@ -1,0 +1,5 @@
+# En estos mails se discute el output de la fuerza de rozamiento
+
+http://lammps.sandia.gov/threads/msg10837.html
+
+https://sourceforge.net/p/lammps/mailman/message/25359615/
