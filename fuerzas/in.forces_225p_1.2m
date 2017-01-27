@@ -1,11 +1,11 @@
 # Pedestrians in a 2D box with two doors
 
 variable imax equal 5
-variable i loop 1 ${imax}
+variable i loop 5 ${imax}
 label start_of_loop1
 print "ITERATION i = $i"		# Loop de velocidad de deseo
 
-variable jmax equal 30
+variable jmax equal 1
 variable j loop 1 ${jmax}
 label start_of_loop2
 print "ITERATION j = $j"		# Loop de corrida
@@ -37,6 +37,8 @@ pair_style       hybrid/overlay gran/social 0 0 0 240000 0 1 social 0.08 3.5
 pair_coeff       * * social 2000 3.5 0.3                                           
 pair_coeff       * * gran/social
 
+#group			 sub id 100 
+
 
 # BOUNDARY CONDITIONS
 
@@ -56,7 +58,7 @@ variable 		s equal c_mycompute                       # 's' is needed for stoppin
 compute 	dijkstra1 all dijkstra/atom 9.4 10.6 20 4 
 variable  	d1 atom c_dijkstra1>0.0
 compute 	reducdij1 all reduce sum v_d1
-variable 	dijk1 equal c_reducdij1
+variable 	dijk1 atom c_reducdij1
 
 ### Forces ###
 variable    pi equal 3.1415
@@ -65,7 +67,7 @@ variable 	fs atom  2*v_pi*0.3*c_ps
 compute     fg all granular_helbing/atom
 compute 	fd all desired_helbing/atom 70 $k
 
-dump        fuerzas all noheader 500 print_forces_1.2m_v$k.txt x y c_fd v_fs c_fg v_d1 
+dump        fuerzas all custom 500 print_forces_1.2m_v$k_test.txt x y c_fd v_fs c_fg v_d1 
 dump_modify fuerzas append  yes
 
 
