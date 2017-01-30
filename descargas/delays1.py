@@ -31,7 +31,7 @@ pylab.rcParams.update(params)
 
 ### DATA ###
 
-data1 = np.genfromtxt('in_print_descarga_225p_v2.5', delimiter = ' ')
+data1 = np.genfromtxt('in_print_descarga_225p_v3', delimiter = ' ')
 
 time=data1[:,0]
 evacuated=data1[:,1]
@@ -54,7 +54,7 @@ def delay(time,evacuated):
           else:
                j=0
           i+=1
-     return  v_delay,len(v_delay)
+     return v_delay,len(v_delay)
 
 
 #print(delay(time,evacuated))
@@ -63,6 +63,7 @@ delay=delay(time,evacuated)[0]
 for i in range(len(delay)):
      delay[i]=delay[i]*0.05
 
+print(np.sum(delay))
 print(delay)
 
 ### PLOT  ###
@@ -80,4 +81,4 @@ pylab.ylim(0, 1.6)
 #pylab.xlim(0, 120)
 #lgd=plt.legend(numpoints=1,handlelength=0.8) 
 #lgd.set_visible(True)   
-pylab.savefig('delay_v2.5.eps', format='eps', dpi=300, bbox_inches='tight')
+pylab.savefig('delay_v3.eps', format='eps', dpi=300, bbox_inches='tight')
