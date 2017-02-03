@@ -46,13 +46,13 @@ vd1=data1[:,0]
 te1 =data1[:,2]
 
 
-num_vel1=11   # Cantidad de velocidades del data1
+num_vel1=20   # Cantidad de velocidades del data1
 terr1=[]
 tee1=[]
 for i in range(0,num_vel1):
   tee1+=[np.mean(te1[30*i:30*i+29])]
   terr1+=[np.std(te1[30*i:30*i+29])]
-vd1=np.linspace(1,11,11) 
+vd1=np.linspace(1,20,20) 
 
 for i in range(0,len(terr1)):
   if (i+1)%3 != 0:
@@ -79,5 +79,5 @@ pylab.legend()
 lgd=plt.legend(numpoints=1,handlelength=0.8) 
 lgd.set_visible(True)
    
-pylab.savefig('fis_compresion_helbing1.eps', format='eps', dpi=300, bbox_inches='tight')
+pylab.savefig('fis_compresion_helbing2.eps', format='eps', dpi=300, bbox_inches='tight')
 

@@ -156,13 +156,13 @@ vd7=data5[:,0]
 te7 =data5[:,2]
 
 
-num_vel7=11   # Cantidad de velocidades del data1
+num_vel7=20   # Cantidad de velocidades del data1
 terr7=[]
 tee7=[]
 for i in range(0,num_vel7):
   tee7+=[np.mean(te7[30*i:30*i+29])]
   terr7+=[np.std(te7[30*i:30*i+29])]
-vd7=np.linspace(1,11,11) 
+vd7=np.linspace(1,20,20) 
 
 for i in range(0,len(terr7)):
   if (i+1)%3 != 0:
