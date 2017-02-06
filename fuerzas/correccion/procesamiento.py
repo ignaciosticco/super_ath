@@ -42,7 +42,7 @@ peso_roz=[]
 peso_social=[]
 peso_deseo=[]
 
-data = np.genfromtxt("out_forces_225p_g0.txt", delimiter = ' ')
+data = np.genfromtxt("out_forces_225p_1.2m_mid3.txt", delimiter = ' ')
 
 
 f_desired = data[:,0]
@@ -68,11 +68,11 @@ plt.plot(vd,peso_roz,'k',lw=1.0,zorder=2)
 #plt.plot(1,1,'w.',zorder=3) 
 #pylab.xticks(np.arange(0,8,2))
 #pylab.yticks(np.arange(20,100,20))
-#pylab.xlabel('$v_d$~(m/s)')
-#pylab.ylabel('Force')
+pylab.xlabel('$v_d$~(m/s)')
+pylab.ylabel('Granular force/~Total force')
 #pylab.legend()
 #pylab.ylim(20, 80)
 #pylab.xlim(0, 6)
 #lgd=plt.legend() 
 #lgd.set_visible(False) 
-pylab.savefig('peso_roz_g0.eps', format='eps', dpi=300, bbox_inches='tight')
+pylab.savefig('peso_roz_1.2_mid3.eps', format='eps', dpi=300, bbox_inches='tight')
