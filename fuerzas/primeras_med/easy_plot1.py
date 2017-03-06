@@ -7,7 +7,7 @@ import pylab
 # a una columna : 6.5   (ancho  in)
 
 golden_mean = (math.sqrt(5)-1.0)/2.0        # Aesthetic ratio
-fig_width = 3+3/8                            # width  in inches
+fig_width = 3+3/8                             # width  in inches
 fig_height = fig_width*golden_mean          # height in inches
 fig_size =  [fig_width,fig_height]
 
@@ -33,36 +33,34 @@ params = {'backend': 'ps',
 pylab.rcParams.update(params)
 
 
-print("F(t)")
+vd=[2,4,6,8,10,12]
 
-mean_desired=[]
-mean_social=[]
-mean_granular=[]
-
-data = np.genfromtxt("print_forces_g0_single_v17.txt", delimiter = ' ')
-
-x = data[:,0]
-y = data[:,1]
-f_social = data[:,2]
-f_granular = data[:,3]
-bc = data[:,4] 
-t=np.linspace(0,len(x)*0.05,len(x))
+fd = [237.67, 528.15, 809.4, 1086.64, 1363.72, 1641.13]
+fs = [3843.44, 9777.38, 13238.88, 16244.58, 19530.94, 22590.13]
+fg = [551.44, 2098.81, 3063.42, 4089.38, 5226.74, 6381.01]
 
 
- 
-plt.plot(t,f_granular,'b',lw=1.0,label='Roz',zorder=2)  
-plt.plot(t,f_social,'r',lw=1.0,label='social',zorder=2) 
-plt.plot(t,bc*4000,'y',lw=1.0,label='BC',zorder=2) 
 
-#plt.plot(1,1,'w.',zorder=3) 
+plt.plot(vd,fd,'w^',label='desired',zorder=3) 
+plt.plot(vd,fd,'k',lw=1.0,zorder=2) 
+#plt.errorbar(vd,te1,yerr1,linestyle='-',fmt='.',color='w',ecolor='k',label='N=225',zorder=1) 
+
+#plt.plot(vd,fs,'ws',label='social',zorder=3) 
+#plt.plot(vd,fs,'k',lw=1.0,zorder=2)
+#plt.errorbar(vd,te2,yerr2,linestyle='-',marker='.',color='k',label='N=583')
+
+plt.plot(vd,fg,'wo',label='granular',zorder=3) 
+plt.plot(vd,fg,'k',lw=1.0,zorder=2)     
+#plt.errorbar(vd,te3,yerr3,linestyle='-',marker='.',color='k',label='N=961') 
+
 #pylab.xticks(np.arange(0,8,2))
 #pylab.yticks(np.arange(20,100,20))
-pylab.xlabel('t~(s)')
+pylab.xlabel('$v_d$~(m/s)')
 pylab.ylabel('Force~(N)')
 #pylab.legend()
 #pylab.ylim(20, 80)
-pylab.xlim(0, 2)
-#lgd=plt.legend() 
-#lgd.set_visible(True) 
-plt.legend(loc=2)
-pylab.savefig('f(t)_vd17.eps', format='eps', dpi=300, bbox_inches='tight')
+#pylab.xlim(0, 6)
+
+plt.legend(loc="upper left", markerscale=0.6,numpoints=1, fontsize=4)
+
+pylab.savefig('forces_1.2m_2.eps', format='eps', dpi=300, bbox_inches='tight')

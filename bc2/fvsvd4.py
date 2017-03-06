@@ -35,34 +35,27 @@ pylab.rcParams.update(params)
 
 print("F(t)")
 
-mean_desired=[]
-mean_social=[]
-mean_granular=[]
 
-data = np.genfromtxt("print_forces_g0_single_v17.txt", delimiter = ' ')
+data = np.genfromtxt("out_fvsvd_bc_1.2m_225p.txt", delimiter = ' ')
 
-x = data[:,0]
-y = data[:,1]
-f_social = data[:,2]
-f_granular = data[:,3]
-bc = data[:,4] 
-t=np.linspace(0,len(x)*0.05,len(x))
+vd= np.linspace(2,12,11)
+f_desired = data[:,0]
+f_social = data[:,1]
+f_granular = data[:,2]
 
 
- 
-plt.plot(t,f_granular,'b',lw=1.0,label='Roz',zorder=2)  
-plt.plot(t,f_social,'r',lw=1.0,label='social',zorder=2) 
-plt.plot(t,bc*4000,'y',lw=1.0,label='BC',zorder=2) 
+#plt.plot(t,f_desired,'k',lw=1.0,zorder=2)  
+plt.plot(vd,f_social,'bo',zorder=2)  
+#plt.plot(t,f_social,'r',lw=1.0,zorder=2)  
 
 #plt.plot(1,1,'w.',zorder=3) 
 #pylab.xticks(np.arange(0,8,2))
 #pylab.yticks(np.arange(20,100,20))
-pylab.xlabel('t~(s)')
-pylab.ylabel('Force~(N)')
+pylab.xlabel('$v_d$~(m/s)')
+pylab.ylabel('Social force~(N)')
 #pylab.legend()
 #pylab.ylim(20, 80)
-pylab.xlim(0, 2)
+#pylab.xlim(0, 6)
 #lgd=plt.legend() 
-#lgd.set_visible(True) 
-plt.legend(loc=2)
-pylab.savefig('f(t)_vd17.eps', format='eps', dpi=300, bbox_inches='tight')
+#lgd.set_visible(False) 
+pylab.savefig('fsocial_bc_225p.eps', format='eps', dpi=300, bbox_inches='tight')

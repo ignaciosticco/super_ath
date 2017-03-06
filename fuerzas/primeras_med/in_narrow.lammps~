@@ -1,0 +1,183 @@
+# Pedestrians in a 2D box
+
+#-----------------------------------#
+# loops                 	    #
+#-----------------------------------#
+
+variable imax equal 10
+variable i loop 10 ${imax}
+label start_of_loop1
+print "ITERATION i = $i"		# Loop de velocidad de deseo
+
+variable wmax equal 1
+variable w loop 1 ${wmax}
+label start_of_loop4
+print "ITERATION w = $w"		# Loop de ancho del pasillo
+
+variable jmax equal 1
+variable j loop 1 ${jmax}
+label start_of_loop2
+print "ITERATION j = $j"		# Loop de iteraciones
+
+#-----------------------------------#
+# intial conditions                 #
+#-----------------------------------#
+
+dimension        2
+boundary         f f p
+
+units            si
+atom_style       sphere
+
+#region           zona1 block 9 28 9.7 10.3 -1 1 units box
+#region           zona1 block -300 20 ${rd} ${ru} -1 1 units box
+region           zona1 block 0 20 0 20 -1 1 units box
+
+
+create_box      1 zona1     	# 1 for one types of atoms
+
+create_atoms 1 single 5 10 0 
+
+create_atoms 1 single 10 10.5 0 
+create_atoms 1 single 10  9.5 0 
+
+set type 1 mass 70.0			     # set mass of each type of atoms
+set type 1 diameter 0.6			     # set diameter of each type of atoms
+
+
+velocity        all set 0 0 0  	     #  set vx=1m/s
+comm_modify     vel yes                                      # required for gran/social style
+
+#velocity        all create 1e23 $j dist gaussian   	     #  dist gaussian
+#comm_modify     vel yes                                      # required for gran/social style
+
+#-----------------------------------#
+# define forces                     #
+#-----------------------------------#
+
+# kn=12000 but now equals $u=0
+# kappa=240000
+
+# A=2000
+# B=0.08
+# R=0.3
+# cutoff=3.5
+# xtarget=20.6
+# ytarget=10
+
+pair_style       hybrid/overlay gran/social 0 0 0 240000 0 1 social 0.08 3.5        
+pair_coeff       * * social 2000 3.5 0.3                                         
+pair_coeff       * * gran/social
+
+
+#-----------------------------------#
+#  boundary conditions              #
+#-----------------------------------#
+
+variable 		k equal $i                          # k is the desired velocity (modulus)
+
+fix walls all wall/region zona1 social 2000 0.08 3.5
+fix wallg all wall/region zona1 granular 240000 0 0.001      # k=240000 unused=1 rad=0.001
+fix target all social/self 70 $k xy                           # mass=70 vd=k point=in (x,y,z)
+
+#variable 	u equal 2500*($j-1)
+
+#-----------------------------------#
+#  Computes                         #
+#-----------------------------------#
+
+compute 	1 all property/atom y
+variable  	b atom "c_1<9.7 || c_1>10.3"
+group          	boundary id > 1 
+fix		2 boundary move linear 0.0 0.0 0.0 
+fix  		3 boundary addforce 2000 0.0 0.0
+
+compute     	gh all granular_helbing/atom
+compute 		dh all desired_helbing/atom 70 $k
+
+#-----------------------------------#
+#   movie                           #
+#-----------------------------------#
+
+#dump 11 all noheader 50 dump_barrera_triple_angosta_1_vivo_vd_$k_tau_005_vs_1.LAMMPS id x y vx vy fx fy
+#dump_modify 11 append yes
+
+#dump        6 all movie 500 movie_narrow_corridor_super_athlets_vd_$k.mp4 type type size 1280 480 &
+#             center s 0.55 0.3 0 axes no 0.8 0.02 view 0 0 zoom 5 adiam 0.6
+
+#dump 	     4 all noheader 50 in_narrow_dump.txt id x y vx vy fx fy
+dump         5 all custom 50 in_narrow_print_.txt x y vx vy c_dh
+
+
+dump         6 all movie 50 in_narrow_movie.mp4 v_b type zoom 7 shiny 0.0
+dump_modify  6 adiam 1 0.6
+dump_modify  6 backcolor white
+dump_modify  6 color red1 1.000 0.961 0.941 &
+               color red2 0.996 0.878 0.824 &
+               color red3 0.988 0.733 0.631 &
+               color red4 0.988 0.573 0.447 &
+               color red5 0.984 0.416 0.290 &
+               color red6 0.937 0.231 0.173 &
+               color red7 0.796 0.094 0.114 &
+               color red8 0.647 0.059 0.082 &
+               color red9 0.404 0.000 0.051
+dump_modify  6 amap min max df 0 2 min 0.5 red1 min max red6
+
+#-----------------------------------#
+#   run process                     #
+#-----------------------------------#
+
+atom_modify     sort 0 0.0
+timestep        0.001
+fix             1 all nve/limit 0.001
+#thermo_style	custom step c_mycompute	#  Tiene que haber un thermo antes, "Step" es necesario
+
+#-----------------------------------#
+#   loop process                    #
+#-----------------------------------#
+
+variable nmax equal 200000
+variable n loop ${nmax}
+label start_of_loop3
+
+run           500
+
+
+variable      t equal 0.05*$n
+
+if "$t > 1" then "jump SELF break"
+#if "$s > 0" then "jump SELF break"
+
+
+next n
+jump SELF start_of_loop3
+
+#-----------------------------------#
+#   end process                     #
+#-----------------------------------#
+
+label break
+
+#print "$t" append faint.txt
+
+#-----------------------------------#
+#   change loop                     #
+#-----------------------------------#
+
+clear
+variable n delete
+
+next j
+jump SELF start_of_loop2
+#	TERMINACION DEL LOOP 2
+
+clear
+next w
+jump SELF start_of_loop4
+
+clear
+next i
+jump SELF start_of_loop1
+
+
+

@@ -1,49 +1,35 @@
 # Pedestrians in a 2D box with two doors
 
-variable mmax equal 1
-variable m loop 1 ${mmax}
-label start_of_loop4			# Loop de gap
-
-variable imax equal 17
-variable i loop 17 ${imax}
+variable imax equal 2
+variable i loop 1 ${imax}
 label start_of_loop1
 print "ITERATION i = $i"		# Loop de velocidad de deseo
 
-variable jmax equal 2
-variable j loop 2 ${jmax}
+variable jmax equal 1
+variable j loop 1 ${jmax}
 label start_of_loop2
 print "ITERATION j = $j"		# Loop de corrida
 
 # INITIAL CONDITIONS
 
 # room: 20x20 meters with 225 individuals 
-# two doors of 1.2 meters width
+# one door of 1.2 meters width
 
 dimension        2
 boundary         f f p
 units            si
 atom_style       sphere
 
-variable		 g equal ($m*0.5)-0.5
-variable		 gd1 equal 10+($g/2)
-variable 		 gu1 equal 11.2+($g/2)
-variable 		 gu2 equal 10-($g/2)
-variable 		 gd2 equal 8.8-($g/2)
-
-
 lattice          sq 1.3 origin 0.5 0.5 0.0
-region           zona1 block 0     20 0   20   -1 1 units box
-region           zona2 block 20.12 40 0   20   -1 1 units box
-region           zona3 block 19    21 ${gd1}  ${gu1} -1 1 units box
-region           zona4 block 19    21 ${gd2}  ${gu2} -1 1 units box
-region           todas union 4 zona1 zona2 zona3 zona4
+region           zona1 block 0 20 0 20 -1 1 units box
+region           zona2 block 20.12 40 0 20 -1 1 units box
+region           zona3 block 19 21 9.4 10.6 -1 1 units box
+region           todas union 3 zona1 zona2 zona3
 
 create_box       1 todas
 create_atoms     1 region zona1
 set              atom * mass 70.0
 set              atom * diameter 0.6
-
-group 			 single id 100 
 velocity         all create 1e23 $j dist gaussian   		# gaussian distribution
 comm_modify      vel yes                                    # required for gran/social style
 
@@ -54,7 +40,7 @@ pair_coeff       * * gran/social
 
 # BOUNDARY CONDITIONS
 
-variable 		k equal $i
+variable 		k equal 2*$i
 
 fix walls all wall/region todas social 2000 0.08 3.5
 fix wallg all wall/region todas granular 240000 120000 0.001      # k=240000 unused=1 rad=0.001
@@ -67,7 +53,7 @@ variable 		s equal c_mycompute                       # 's' is needed for stoppin
 
 
 ### Blocking clusters ###
-compute 	dijkstra1 all dijkstra/atom  11.2 8.8 20 4 
+compute 	dijkstra1 all dijkstra/atom 9.4 10.6 20 4 
 variable  	d1 atom c_dijkstra1>0.0
 compute 	reducdij1 all reduce sum v_d1
 variable 	dijk1 equal c_reducdij1
@@ -75,18 +61,17 @@ variable 	dijk1 equal c_reducdij1
 ### Forces ###
 variable    pi equal 3.1415
 compute     ps all helbing_pressure/atom
-variable    fs atom  2*v_pi*0.3*c_ps 
+variable 	fs atom  2*v_pi*0.3*c_ps 
 compute     fg all granular_helbing/atom
-compute     fd all desired_helbing/atom 70 $k
+compute 	fd all desired_helbing/atom 70 $k
 
-
-dump        fuerzas single noheader 500 print_forces_g0_single_v$k.txt x y v_fs c_fg v_d1 
+dump        fuerzas all noheader 500 print_forces_1.2m_v$k.txt x y c_fd v_fs c_fg v_d1 
 dump_modify fuerzas append  yes
 
 
 # VISUALIZATION (OPTIONAL)
 
-#dump        3 single movie 200 in_movie.mpg type type &
+#dump        3 all movie 200 in_movie_v$k.mpg type type &
 #            axes yes 0.8 0.02 view 0 0 zoom 3 adiam 0.6
 
 # RUN THE PROCESS
@@ -105,10 +90,7 @@ variable n loop ${nmax}
 label start_of_loop3
 	
 run           500 
-
-
-if "$s > 159" then "jump SELF break"
-
+if "$s > 1" then "jump SELF break"
 
 
 variable t equal 0.05*$n
@@ -136,7 +118,4 @@ jump SELF start_of_loop2
 clear
 next i
 jump SELF start_of_loop1
-
-next m
-jump SELF start_of_loop4
 
