@@ -4,8 +4,8 @@
 # loops                 	    #
 #-----------------------------------#
 
-variable imax equal 1
-variable i loop 1 ${imax}
+variable imax equal 2
+variable i loop 2 ${imax}
 label start_of_loop1
 print "ITERATION i = $i"		# Loop de velocidad de deseo
 
@@ -31,7 +31,7 @@ atom_style       sphere
 region           zona1 block 0 100 0 20 -1 1 units box
 create_box       1 zona1     	                             # 1 for one types of atoms
 
-variable         k   equal ($i-0.9999)
+variable         k   equal $i
 variable         f   equal 2000.0*$k
 variable         dij equal 0.6-0.08*ln($f/2000)
 variable         lower equal 10.0-${dij}
@@ -115,14 +115,14 @@ dump_modify  6 color red1 1.000 0.961 0.941 &
                color red9 0.404 0.000 0.051
 dump_modify  6 amap min max df 0 2 min 0.5 red1 min max red6
 
-#dump         5 all noheader 500 in_narrow_print_vd$k.txt v_h x y vx vy c_fg c_ps fx fy
+dump         5 all noheader 500 in_narrow_print_fino_vd$k.txt v_h x y vx vy c_fg c_ps fx fy
 
 #-----------------------------------#
 #   run process                     #
 #-----------------------------------#
 
 atom_modify     sort 0 0.0
-timestep        0.00001
+timestep        0.000001
 fix             1 myatom nve
 thermo_style	custom step c_3 #  Tiene que haber un thermo antes, "step" es necesario
 
@@ -136,7 +136,7 @@ label start_of_loop3
 
 run           500
 
-variable      t equal 0.005*$n
+variable      t equal 0.0005*$n
 variable      h atom $t
 
 #if "$t > 0.55" then "jump SELF break"

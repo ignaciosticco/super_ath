@@ -33,9 +33,11 @@ params = {'backend': 'ps',
 
 pylab.rcParams.update(params)
 
-print("Calcula v(t) de la particula central de narrow")
+print("Calcula energia(t) de la particula central de narrow")
 
-data = np.genfromtxt("in_narrow_print_fino_vd2.txt",  delimiter = ' ')
+vd = 5
+vds=str(vd)
+data = np.genfromtxt("in_narrow_print_vd%s.txt" %vds,  delimiter = ' ')
 
 t= data[:,0]
 x = data[:,1]
@@ -51,6 +53,13 @@ x_central=[]
 vx_central=[]
 t_cental=[]
 f_roz=[]
+energy_social=[]
+energy_roz=[]
+energy_desired=[]
+
+
+m = 70
+tau=0.5
 
 i=0
 suma_vel=0
@@ -59,23 +68,27 @@ while i<len(vx)/3:
   vx_central+= [vx[i*3]]
   t_cental+= [t[i*3]]
   f_roz+=[f_granular[i*3]]
+  energy_roz+=[f_granular[i*3]*vx[i*3]*0.005]
+  energy_social+=[f_social[i*3]*vx[i*3]*0.005]
+  energy_desired+=[(m*(vd-vx[i*3])/tau)*vx[i*3]*0.005]
   i+=1
 
 
 #plt.plot(t_cental,vx_central,'b',label='speed',lw=0.7,zorder=2) 
-plt.plot(t_cental,vx_central,'b',label='speed',lw=0.7,zorder=2) 
-#plt.plot(t_cental,x_central,'b',label='speed',lw=0.7,zorder=2)
+plt.semilogy(t_cental,energy_social,'b',label='social',lw=0.7,zorder=2) 
+plt.semilogy(t_cental,energy_roz,'r',label='granular',lw=0.7,zorder=2)
+plt.semilogy(t_cental,energy_desired,'g',label='desired',lw=0.7,zorder=2)
 #plt.plot(time,f_roz,'r',label='friction',lw=0.7,zorder=2) 
 #plt.plot(time,v_speed_100,'g',label='speed',lw=0.7,zorder=2) 
 #plt.plot(1,1,'w.',zorder=3) 
 #pylab.xticks(np.arange(0,8,2))
 #pylab.yticks(np.arange(20,100,20))
 pylab.xlabel('t~(s)')
-pylab.ylabel('speed~(m/s)')
+pylab.ylabel('Energy(J)')
 #pylab.legend()
 #pylab.xlim(0, 3)
 #pylab.ylim(0, 20)
 #lgd=plt.legend() 
 #lgd.set_visible(True) 
-#plt.legend(loc=2,labelspacing=0.2,borderpad=0.1,handletextpad=0.1)
-pylab.savefig('speed_vd2_fino.eps', format='eps', dpi=300, bbox_inches='tight')
+plt.legend(loc=1,labelspacing=0.2,borderpad=0.1,handletextpad=0.1)
+pylab.savefig('energy_vst_vd%s.eps' %vds, format='eps', dpi=300, bbox_inches='tight')

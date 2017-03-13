@@ -4,8 +4,8 @@
 # loops                 	    #
 #-----------------------------------#
 
-variable imax equal 1
-variable i loop 1 ${imax}
+variable imax equal 3
+variable i loop 3 ${imax}
 label start_of_loop1
 print "ITERATION i = $i"		# Loop de velocidad de deseo
 
@@ -31,7 +31,7 @@ atom_style       sphere
 region           zona1 block 0 100 0 20 -1 1 units box
 create_box       1 zona1     	                             # 1 for one types of atoms
 
-variable         k   equal ($i-0.9999)
+variable         k   equal $i
 variable         f   equal 2000.0*$k
 variable         dij equal 0.6-0.08*ln($f/2000)
 variable         lower equal 10.0-${dij}
@@ -61,7 +61,7 @@ pair_coeff       * * gran/social
 #-----------------------------------#
 
 fix walls all wall/room zona1 2000 0.08 3.5 240000 0.0 0.0
-fix target all desire 70 $k 0.5 10.6 9.4 80     
+#fix target all desire 70 $k 0.5 10.6 9.4 80     
 
 
 #-----------------------------------#
@@ -116,6 +116,7 @@ dump_modify  6 color red1 1.000 0.961 0.941 &
 dump_modify  6 amap min max df 0 2 min 0.5 red1 min max red6
 
 #dump         5 all noheader 500 in_narrow_print_vd$k.txt v_h x y vx vy c_fg c_ps fx fy
+dump         5 all noheader 500 in_narrow_print_vd$k.txt vx
 
 #-----------------------------------#
 #   run process                     #

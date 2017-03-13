@@ -4,8 +4,8 @@
 # loops                 	    #
 #-----------------------------------#
 
-variable imax equal 5
-variable i loop 4 ${imax}
+variable imax equal 1
+variable i loop 1 ${imax}
 label start_of_loop1
 print "ITERATION i = $i"		# Loop de velocidad de deseo
 
@@ -31,7 +31,7 @@ atom_style       sphere
 region           zona1 block 0 100 0 20 -1 1 units box
 create_box       1 zona1     	                             # 1 for one types of atoms
 
-variable         k   equal $i
+variable         k   equal ($i-1)
 variable         f   equal 2000.0*$k
 variable         dij equal 0.6-0.08*ln($f/2000)
 variable         lower equal 10.0-${dij}
@@ -101,10 +101,10 @@ variable     h atom 0.0
 
 
 
-#dump         6 all movie 500 in_narrow_vd$k_movie.mp4 v_b type zoom 22 shiny 0.0 center s 0.1 0.5 0
-#dump_modify  6 adiam 1 0.6
-#dump_modify  6 backcolor white
-#dump_modify  6 color red1 1.000 0.961 0.941 &
+dump         6 all movie 500 in_narrow_vd$k.mp4 v_b type zoom 22 shiny 0.0 center s 0.1 0.5 0
+dump_modify  6 adiam 1 0.6
+dump_modify  6 backcolor white
+dump_modify  6 color red1 1.000 0.961 0.941 &
                color red2 0.996 0.878 0.824 &
                color red3 0.988 0.733 0.631 &
                color red4 0.988 0.573 0.447 &
@@ -113,9 +113,9 @@ variable     h atom 0.0
                color red7 0.796 0.094 0.114 &
                color red8 0.647 0.059 0.082 &
                color red9 0.404 0.000 0.051
-#dump_modify  6 amap min max df 0 2 min 0.5 red1 min max red6
+dump_modify  6 amap min max df 0 2 min 0.5 red1 min max red6
 
-dump         5 all noheader 500 in_narrow_print_vd$k.txt v_h x y vx vy c_fg c_ps fx fy
+#dump         5 all noheader 500 in_narrow_print_vd$k.txt v_h x y vx vy c_fg c_ps fx fy
 
 #-----------------------------------#
 #   run process                     #

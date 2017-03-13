@@ -33,8 +33,8 @@ pylab.rcParams.update(params)
 
 v_min = []
 te = []
-f_granular_min = []
-f_social_min = []
+pot_granular_min = []
+pot_social_min = []
 
 vd = np.linspace(1,17,17)
 
@@ -70,15 +70,17 @@ for j in vd:
 
     
     te+=[t[len(t)-1]]
-    v_min+=[min(vx_central[50:])]   # Excluyo los primeros 2.5 segundos
-    f_granular_min+=[f_granular[np.argmin(vx_central[50:])]]
-    f_social_min+=[f_social[np.argmin(vx_central[50:])]+campo_externo]
+    vel_min = min(vx_central[50:])
+    v_min+=[vel_min]   # Excluyo los primeros 2.5 segundos
+    pot_granular_min+=[f_granular[np.argmin(vx_central[50:])]*vel_min]
+    pot_social_min+=[(f_social[np.argmin(vx_central[50:])]+campo_externo)*vel_min]
 
 
 
 v_min_inv = np.reciprocal(v_min)   # Invierto cada elemento de v_min
 
-plt.plot(vd,np.divide(f_granular_min ,f_social_min),'b',lw=0.7,zorder=2) 
+plt.plot(vd,pot_social_min,'b',label='social',lw=0.7,zorder=2) 
+plt.plot(vd,pot_granular_min,'r',label='friction',lw=0.7,zorder=2) 
 #plt.plot(vd,v_min_inv,'b',label='speed',lw=0.7,zorder=2) 
 #plt.plot(t_cental,x_central,'b',label='speed',lw=0.7,zorder=2)
 #plt.plot(time,f_roz,'r',label='friction',lw=0.7,zorder=2) 
@@ -87,12 +89,12 @@ plt.plot(vd,np.divide(f_granular_min ,f_social_min),'b',lw=0.7,zorder=2)
 #pylab.xticks(np.arange(0,8,2))
 #pylab.yticks(np.arange(20,100,20))
 pylab.xlabel('v$_d$~(m/s)')
-pylab.ylabel('fg\_fs')
+pylab.ylabel('Potencia ')
 #pylab.legend()
 #pylab.xlim(0, 3)
 #pylab.ylim(0, 25)
 #lgd=plt.legend() 
 #lgd.set_visible(True) 
-#plt.legend(loc=2,labelspacing=0.2,borderpad=0.1,handletextpad=0.1)
-pylab.savefig('cociente_min_vsvd_narrow.eps', format='eps', dpi=300, bbox_inches='tight')
+plt.legend(loc=2,labelspacing=0.2,borderpad=0.1,handletextpad=0.1)
+pylab.savefig('cocientepotencia_min_vsvd_narrow.eps', format='eps', dpi=300, bbox_inches='tight')
 
