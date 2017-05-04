@@ -31,7 +31,7 @@ atom_style       sphere
 region           zona1 block 0 100 0 20 -1 1 units box
 create_box       1 zona1     	                             # 1 for one types of atoms
 
-variable         k   equal $i+0.25
+variable         k   equal $i
 variable         f   equal 2000.0*$k
 variable         dij equal 0.6-0.08*ln($f/2000)
 variable         lower equal 10.0-${dij}

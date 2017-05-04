@@ -1,25 +1,23 @@
 # Pedestrians in a 2D box
 
-## El output tiene solo los datos del individuo pasante. 
-
 #-----------------------------------#
 # loops                 	    #
 #-----------------------------------#
 
-variable imax equal 1
-variable i loop 1 ${imax}
+variable pre_vdmax equal 22
+variable pre_vd loop 3 ${pre_vdmax}
 label start_of_loop1
-print "ITERATION i = $i"		# Loop de velocidad de deseo
+print "ITERATION pre_vd = ${pre_vd}"	# Loop de velocidad de deseo
 
 variable wmax equal 1
 variable w loop 1 ${wmax}
 label start_of_loop4
 print "ITERATION w = $w"		# Loop de ancho del pasillo
 
-variable jmax equal 1
-variable j loop 1 ${jmax}
+variable itermax equal 1
+variable iter loop 1 ${itermax}
 label start_of_loop2
-print "ITERATION j = $j"		# Loop de iteraciones
+print "ITERATION iter = ${iter}"		# Loop de corrida
 
 #-----------------------------------#
 # intial conditions                 #
@@ -31,20 +29,26 @@ units            si
 atom_style       sphere
 
 region           zona1 block 0 100 0 20 -1 1 units box
-create_box       1 zona1     	                             # 1 for one types of atoms
+create_box       2 zona1     	                             # 1 for one types of atoms
 
-variable         k   equal $i
-variable         f   equal 2000.0*$k
+variable         vd   equal ${pre_vd}/2
+variable         vel atom ${vd}
+variable         f   equal 2000.0*${vd}
 variable         dij equal 0.6-0.08*ln($f/2000)
+variable         xi equal 10-sqrt(0.36-${dij}*${dij})
+variable         ximax equal 10+sqrt(0.36-${dij}*${dij})
 variable         lower equal 10.0-${dij}
 variable         upper equal 10.0+${dij}
 
 create_atoms     1 single 10 10 0 
+#create_atoms     1 single ${xi} 10 0 
 create_atoms     1 single 10 ${upper} 0 
 create_atoms     1 single 10 ${lower} 0 
 
-set type         1 mass 70.0			                     # set mass of each type of atoms
-set type         1 diameter 0.6			                     # set diameter of each type of atoms
+set	 	type 1 mass 70.0			     # set mass of each type of atoms
+set		type 2 mass 70.0
+set		type 1 diameter 0.6			     # set diameter of each type of atoms
+set		type 2 diameter 0.6
 velocity         all set 0 0 0  	                     	 #  set vx=1m/s
 comm_modify      vel yes                                     # required for gran/social style
 
@@ -62,9 +66,8 @@ pair_coeff       * * gran/social
 #  boundary conditions              #
 #-----------------------------------#
 
-fix walls all wall/room zona1 2000 0.08 3.5 240000 0.0 0.0
-fix target all desire 70 $k 0.5 10.6 9.4 80     
-
+fix walls all wall/room zona1 2000.0 0.08 3.5 240000 0.0 0.0
+fix target all desire 70 ${vd} 0.5 10.6 9.4 80     
 
 #-----------------------------------#
 #  Computes                         #
@@ -76,12 +79,13 @@ group       boundary id > 1
 fix			3 boundary move linear 0.0 0.0 0.0 
 
 compute 	2 all property/atom x
-variable  	c atom c_2>10.6
+variable  	c atom c_2>${ximax}
 compute     3 all reduce sum v_c
 variable    d equal c_3
 
 group       myatom id == 1
 fix  		4 myatom addforce $f 0.0 0.0
+set  		group myatom type 2
 
 compute     4 all ke/atom 
 compute     5 all pe/atom pair 
@@ -91,7 +95,8 @@ variable    pi equal 3.1415
 compute     ps all helbing_pressure/atom
 variable 	fs atom  2*v_pi*0.3*c_ps 
 compute     fg all granular_helbing/atom
-compute 	fd all desired_helbing/atom 70 $i
+
+#compute 	fd all desired_helbing/atom 70 $i
 
 variable     h atom 0.0
 
@@ -101,28 +106,15 @@ variable     h atom 0.0
 #-----------------------------------#
 
 
-dump         6 all movie 500 in_narrow_vd$k.mp4 v_b type zoom 22 shiny 0.0 center s 0.1 0.5 0
-dump_modify  6 adiam 1 0.6
-dump_modify  6 backcolor white
-dump_modify  6 color red1 1.000 0.961 0.941 &
-               color red2 0.996 0.878 0.824 &
-               color red3 0.988 0.733 0.631 &
-               color red4 0.988 0.573 0.447 &
-               color red5 0.984 0.416 0.290 &
-               color red6 0.937 0.231 0.173 &
-               color red7 0.796 0.094 0.114 &
-               color red8 0.647 0.059 0.082 &
-               color red9 0.404 0.000 0.051
-dump_modify  6 amap min max df 0 2 min 0.5 red1 min max red6
-
-dump         5 myatom noheader 500 in_narrow_print_solo_vd$k.txt fx c_fg v_fs vx 
+#dump         5 all noheader 500 dump_todas_las_fuerzas_T_simple_vd_${vd}.txt id x y vx vy c_fg v_fs v_vel fx fy v_h
+#dump_modify  5 append yes
 
 #-----------------------------------#
 #   run process                     #
 #-----------------------------------#
 
 atom_modify     sort 0 0.0
-timestep        0.00001
+timestep        0.000001
 fix             1 myatom nve
 thermo_style	custom step c_3 #  Tiene que haber un thermo antes, "step" es necesario
 
@@ -136,22 +128,26 @@ label start_of_loop3
 
 run           500
 
-variable      t equal 0.005*$n
+variable      t equal 0.0005*$n
 variable      h atom $t
 
 #if "$t > 0.55" then "jump SELF break"
 if "$d > 0" then "jump SELF break"
+#if "$n > 5" then "jump SELF break"
 
 next n
 jump SELF start_of_loop3
+
+
 
 #-----------------------------------#
 #   end process                     #
 #-----------------------------------#
 
 label break
+print "${vd}   ${iter}   $t" append print_narrow_fisf.txt
 
-#print "${dij}" append in_narrow_social_print_dij.txt
+#print "${vd} $t" append tiempos_modelo_simple.txt
 
 #-----------------------------------#
 #   change loop                     #
@@ -159,12 +155,15 @@ label break
 
 clear
 variable n delete
-next j
+next iter
 jump SELF start_of_loop2
 #	TERMINACION DEL LOOP 2
 clear
 next w
 jump SELF start_of_loop4
 clear
-next i
+next pre_vd
 jump SELF start_of_loop1
+
+
+

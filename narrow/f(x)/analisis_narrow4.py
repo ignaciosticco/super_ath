@@ -69,7 +69,7 @@ for i in range(0,1):
   # central= particula que se mueve 
   x_central_dmedio=[]   # distancia al centro (10,10) del peaton que se mueve (central) 
 
-  x_central=[]
+  locals()['x_central_vd{0}'.format(v)]=[]
   vx_central=[]
   locals()['t_central_vd{0}'.format(v)]=[]
   f_granular_central=[]
@@ -84,7 +84,7 @@ for i in range(0,1):
   suma_vel=0
   while i<len(vx)/3:
       x_central_dmedio+=[abs(x[i*3]-10)]
-      x_central+=[x[i*3]]
+      locals()['x_central_vd{0}'.format(v)]+=[x[i*3]]
       vx_central+= [vx[i*3]]
       f_desired_central+= [(v-vx[i*3])*m/tau]
       locals()['t_central_vd{0}'.format(v)]+= [t[i*3]]
@@ -98,15 +98,15 @@ for i in range(0,1):
 #print(f_neta_central_vd2)
 ### Plot ###
 
-plt.semilogy(t_central_vd10,f_neta_central_vd10,'k',label='Net',lw=0.7,zorder=2)
-plt.semilogy(t_central_vd10,f_granular_central,'g',label='friction',lw=0.7,zorder=2)
-plt.semilogy(t_central_vd10,f_social_central,'r',label='social',lw=0.7,zorder=2)
-plt.semilogy(t_central_vd10,f_desired_central,'b',label='desired',lw=0.7,zorder=2)
+plt.semilogy(x_central_vd10,f_neta_central_vd10,'k',label='Net',lw=0.7,zorder=2)
+plt.semilogy(x_central_vd10,f_granular_central,'g',label='friction',lw=0.7,zorder=2)
+plt.semilogy(x_central_vd10,f_social_central,'r',label='social',lw=0.7,zorder=2)
+plt.semilogy(x_central_vd10,f_desired_central,'b',label='desired',lw=0.7,zorder=2)
 
-pylab.xlabel('time~(s)')
-pylab.ylabel('Net Force~(N)')
-pylab.xlim(0, 3)
-pylab.ylim(10, 100000)
+pylab.xlabel('x~(m)')
+pylab.ylabel('Force~(N)')
+pylab.xlim(9.4, 11)
+#pylab.ylim(10, 100000)
 plt.grid(False)
 plt.legend(loc='mid right',labelspacing=0.2,borderpad=0.1,handletextpad=0.1)
-pylab.savefig('f(t)_vd10_log.eps', format='eps', dpi=300, bbox_inches='tight')
+pylab.savefig('f(x)_vd10_log.eps', format='eps', dpi=300, bbox_inches='tight')

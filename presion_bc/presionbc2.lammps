@@ -1,0 +1,123 @@
+# Pedestrians in a 2D box
+
+variable pre_vdmax equal 1
+variable pre_vd loop 1 ${pre_vdmax}
+label start_of_loop1
+print "ITERATION pre_vd = ${pre_vd}"		# Loop de velocidad de deseo
+
+variable itermax equal 30
+variable iter loop 1 ${itermax}
+label start_of_loop2
+print "ITERATION iter = ${iter}"		# Loop de corrida
+
+# 		 intial conditions
+
+dimension        2
+boundary         p f p
+
+units            si
+atom_style       sphere
+
+lattice          sq 1.3 origin 0.5 0.5 0.0
+region           zona1 block 0 20 0 20 -1 1 units box
+region           zona2 block 20.12 40 0 20 -1 1 units box
+region           zona3 block 19 21 9.4 10.6 -1 1 units box
+region           todas union 3 zona1 zona2 zona3
+
+create_box       1 todas
+create_atoms     1 region zona1
+
+set              atom * mass 70.0
+set              atom * diameter 0.6
+
+velocity         all create 1e23 $j dist gaussian   		#  dist gaussian
+comm_modify      vel yes                                    # required for gran/social style
+
+#  Potentials
+
+pair_style      hybrid/overlay gran/social 0 0 0 240000 0 1 social 0.08 3.5        
+pair_coeff      * * social 2000 3.5 0.3                                          
+pair_coeff      * * gran/social
+fix walls  	 	all wall/region todas social 2000 0.08 3.5
+fix wallg 	 	all wall/region todas granular 240000 0 0.001 
+fix target 	 	all social/self 70 $i xy      
+
+
+### COMPUTES ###
+
+compute 	1 all property/atom x
+compute 	2 all reduce sum c_1   
+variable  	b atom c_1>20.0 
+compute 	mycompute all reduce sum v_b
+variable 	s equal c_mycompute
+compute 	3 all dijkstra/atom 10.6 9.4 20 4   
+variable  	c atom c_3>0.0
+group       myatoms dynamic all var c
+
+variable        h atom 0
+
+### Forces ###
+variable    pi equal 3.1415
+compute     ps myatoms helbing_pressure/atom
+variable 	fs atom  2*v_pi*0.3*c_ps 
+compute     fg myatoms granular_helbing/atom
+compute 	fd myatoms desired_helbing/atom 70 $i
+
+dump        7 myatoms noheader 500 print_bcdata_225p_1.2m_bis_vd$i.txt c_3 id v_h x y c_fd v_fs c_fg  
+dump_modify 7 append yes
+
+
+# VISUALIZATION (OPTIONAL)
+
+#dump        3 all movie 200 in_movie_v$i.mpg type type &
+#            axes yes 0.8 0.02 view 0 0 zoom 3 adiam 0.6
+
+# run the process
+
+atom_modify     sort 0 0.0
+timestep        0.0001
+fix             1 all nve/limit 0.001
+
+#thermo         500
+thermo_style	custom step c_mycompute    # tiene que haber un thermo antes, "step" es necesario
+
+#	ESTE ES EL LOOP DE UN PROCESO
+
+variable nmax equal 200000
+variable n loop ${nmax}
+label start_of_loop3
+
+run 	            500
+
+#variable		    g atom "c_1>25"
+#group           	back variable g
+#displace_atoms      back move -12 0 0 units box
+#variable 			g delete
+#group 				back delete
+
+variable        	t equal 0.05*$n
+variable        	h atom $t
+
+
+if "$s > 159" then "jump SELF break"
+#if "$t > 2000" then "jump SELF break"
+
+next n
+jump SELF start_of_loop3
+
+
+#	TERMINACION DEL PROCESO
+
+label break
+
+#print "$k  $j  $t $h" append faint.txt
+
+clear
+variable n delete
+next iter
+jump SELF start_of_loop2
+# TERMINACION DEL LOOP 2
+clear
+next pre_vd
+jump SELF start_of_loop1
+

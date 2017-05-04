@@ -46,8 +46,8 @@ m=70
 tau=0.5
 
 #vd = np.linspace(1,17,17)
-vd=[2,3,4,5,6,7.5,10]
-for i in range(0,7):
+vd=[1.25,2,3,4,5,6,7.5,9,10]
+for i in range(0,9):
   v=str(vd[i])
   data = np.genfromtxt("in_narrow_print_fino_vd%s.txt" %v, delimiter = ' ')
   v=int(vd[i])
@@ -78,7 +78,9 @@ for i in range(0,7):
   ## filtrar datos de la particula central ##
   i=0
   suma_vel=0
-  while i<len(vx)/3:
+  #fin=len(vx)/3    # cantidad de timesteps a considerar
+  fin=3
+  while i<fin:
       x_central_dmedio+=[abs(x[i*3]-10)]
       x_central+=[x[i*3]]
       vx_central+= [vx[i*3]]
@@ -99,18 +101,20 @@ for i in range(0,7):
 #plt.semilogy(t_central_vd4,f_x_central_vd4,'r',label='vd=4',lw=0.7,zorder=2)
 #plt.semilogy(t_central_vd7,f_x_central_vd7,'k',label='vd=7.5',lw=0.7,zorder=2)
 
+plt.plot(t_central_vd1,f_x_central_vd1,'orange',label='vd=1.25',lw=0.7,zorder=2)
 plt.plot(t_central_vd2,f_x_central_vd2,'b',label='vd=2',lw=0.7,zorder=2)
 plt.plot(t_central_vd3,f_x_central_vd3,'c',label='vd=3',lw=0.7,zorder=2)
 plt.plot(t_central_vd4,f_x_central_vd4,'r',label='vd=4',lw=0.7,zorder=2)
 plt.plot(t_central_vd5,f_x_central_vd5,'g',label='vd=5',lw=0.7,zorder=2)
 plt.plot(t_central_vd6,f_x_central_vd6,'y',label='vd=6',lw=0.7,zorder=2)
 plt.plot(t_central_vd7,f_x_central_vd7,'k',label='vd=7.5',lw=0.7,zorder=2)
+plt.plot(t_central_vd9,f_x_central_vd9,'*c',label='vd=9',lw=0.1,zorder=2)
 plt.plot(t_central_vd10,f_x_central_vd10,'m',label='vd=10',lw=0.7,zorder=2)
 
 pylab.xlabel('time~(s)')
 pylab.ylabel('f neta~(N)')
 plt.grid(False, which="minor")
-pylab.xlim(-0.1, 1.2)
-pylab.ylim(0, 250)
-plt.legend(loc='mid right',labelspacing=0.2,borderpad=0.1,handletextpad=0.1)
-pylab.savefig('f(t)_3.eps', format='eps', dpi=300, bbox_inches='tight')
+pylab.xlim(-0.001, 0.005)
+pylab.ylim(0, 1000)
+plt.legend(loc='center up',labelspacing=0.1,borderpad=0.01,handletextpad=0.05)
+pylab.savefig('f(t)_4.eps', format='eps', dpi=300, bbox_inches='tight')
